@@ -119,6 +119,31 @@ We chose **Laravel Sanctum** for API authentication because:
 
 For **simple projects**, Sanctum is more than sufficient and provides enterprise-level security without complexity.
 
+## Frontend Architecture
+
+### Vue.js with Inertia.js
+
+**Laravel includes built-in support for Vue.js with Inertia.js**, which allows creating SPA applications while maintaining server-side routing.
+
+#### ⚠️ Architectural Considerations
+
+**Inertia.js does not allow clear separation of frontend/backend roles:**
+
+- ❌ **Single Repository**: Frontend and backend in the same codebase
+- ❌ **Coupled Deployment**: Frontend changes require full application deployment
+- ❌ **Team Dependencies**: Frontend and backend teams must coordinate every release
+- ❌ **Technology Lock-in**: Frontend is tightly bound to backend technology choices
+
+#### 💡 Recommendation
+
+For projects requiring **role separation** between frontend and backend teams:
+
+1. **Separate Client Repository**: Create a dedicated Vue.js/Nuxt.js project
+2. **API-First Approach**: Use this backend as pure API with Sanctum
+3. **Independent Deployment**: Frontend and backend can be deployed separately
+4. **Scalability**: Possibility of having specialized teams for each layer
+
+
 ## Database Schema
 
 The application includes a basic CRM structure with referential integrity constraints:
@@ -154,27 +179,54 @@ The application uses **Laravel API Resources** to format and control JSON respon
 - **OrderResource**: Formats amounts, dates, and includes human-readable status labels
 - **Conditional Fields**: Uses `whenLoaded()` and `when()` to include data only when appropriate
 
-### Example Response
+## API Endpoints
 
-```json
-// GET /api/customers (list)
-{
-  "id": 1,
-  "name": "Mario Rossi",
-  "email": "mario@example.com",
-  "phone": "+39 123 456 789",
-  "created_at": "15/01/2026",
-  "orders_count": 3
-}
+All API endpoints require authentication using **Laravel Sanctum** tokens.
 
-// GET /api/customers/1 (detail)
-{
-  "id": 1,
-  "name": "Mario Rossi", 
-  "email": "mario@example.com",
-  "phone": "+39 123 456 789",
-  "address": "Via Roma 123, Milan",
-  "created_at": "15/01/2026",
-  "orders_count": 3
-}
+### Base URL
 ```
+http://localhost:8080/api
+```
+
+### Authentication
+```http
+GET /api/user
+Authorization: Bearer {token}
+```
+Returns authenticated user information.
+
+### Customers
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/customers` | List all customers with pagination |
+| `POST` | `/customers` | Create a new customer |
+| `GET` | `/customers/{id}` | Get customer details |
+| `PUT` | `/customers/{id}` | Update customer |
+| `DELETE` | `/customers/{id}` | Delete customer (soft delete) |
+| `GET` | `/customers/{id}/orders` | Get customer's orders |
+
+### Orders
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/orders` | List all orders with pagination |
+| `POST` | `/orders` | Create a new order |
+| `GET` | `/orders/{id}` | Get order details |
+| `PUT` | `/orders/{id}` | Update order |
+| `DELETE` | `/orders/{id}` | Delete order (soft delete) |
+
+### Required Fields
+
+#### Customer
+- `name` (string, required)
+- `email` (string, required, unique)
+- `phone` (string, optional)
+- `address` (string, optional)
+
+#### Order
+- `customer_id` (integer, required)
+- `amount` (decimal, required)
+- `status` (enum: pending, processing, completed, cancelled)
+- `notes` (text, optional)
+
