@@ -118,3 +118,63 @@ We chose **Laravel Sanctum** for API authentication because:
 - ✅ **Rate Limiting**: Built-in protection against brute force attacks
 
 For **simple projects**, Sanctum is more than sufficient and provides enterprise-level security without complexity.
+
+## Database Schema
+
+The application includes a basic CRM structure with referential integrity constraints:
+
+### Tables
+
+- **customers**: Client information (name, email, address, phone)
+- **orders**: Customer orders with foreign key relationship
+
+### Key Constraints
+
+- **Soft Deletes**: Both customers and orders use soft deletes (deleted_at column)
+- **Referential Integrity**: Orders have a foreign key to customers with `RESTRICT ON DELETE`
+- **Data Protection**: A customer cannot be deleted if they have existing orders
+- **Order Status**: ENUM values (pending, processing, completed, cancelled)
+
+This ensures data integrity and prevents orphaned records while maintaining audit trails through soft deletes.
+
+## API Resources
+
+The application uses **Laravel API Resources** to format and control JSON responses:
+
+### Why API Resources?
+
+- ✅ **Data Control**: Expose only necessary fields per endpoint
+- ✅ **Format Consistency**: Automatic date formatting and data transformation
+- ✅ **Performance**: Conditional loading prevents N+1 queries
+- ✅ **Context Aware**: Different data based on route (list vs detail)
+
+### Implementation
+
+- **CustomerResource**: Shows basic info in lists, full details (including address) in show endpoints
+- **OrderResource**: Formats amounts, dates, and includes human-readable status labels
+- **Conditional Fields**: Uses `whenLoaded()` and `when()` to include data only when appropriate
+
+### Example Response
+
+```json
+// GET /api/customers (list)
+{
+  "id": 1,
+  "name": "Mario Rossi",
+  "email": "mario@example.com",
+  "phone": "+39 123 456 789",
+  "created_at": "15/01/2026",
+  "orders_count": 3
+}
+
+// GET /api/customers/1 (detail)
+{
+  "id": 1,
+  "name": "Mario Rossi", 
+  "email": "mario@example.com",
+  "phone": "+39 123 456 789",
+  "address": "Via Roma 123, Milan",
+  "created_at": "15/01/2026",
+  "orders_count": 3
+}
+```
