@@ -24,11 +24,11 @@ docker compose up -d --build
 echo "⏳ Waiting for services to be ready..."
 sleep 30
 
+echo "� Installing Composer dependencies..."
+docker compose exec app composer install
+
 echo "🔑 Generating application key..."
 docker compose exec app php artisan key:generate
-
-echo "📦 Installing Composer dependencies..."
-docker compose exec app composer install
 
 echo "🎨 Installing Node.js dependencies..."
 docker compose exec app npm install
