@@ -1,6 +1,6 @@
-# Laravel 12 Docker Setup
+# Inventory App
 
-Dockerized environment for Laravel 12 with nginx, MySQL, and phpMyAdmin.
+Inventory management system built with Laravel 12, featuring customer and order management with Docker deployment.
 
 ## Included Services
 
