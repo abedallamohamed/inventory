@@ -119,31 +119,6 @@ We chose **Laravel Sanctum** for API authentication because:
 
 For **simple projects**, Sanctum is more than sufficient and provides enterprise-level security without complexity.
 
-## Frontend Architecture
-
-### Vue.js with Inertia.js
-
-**Laravel includes built-in support for Vue.js with Inertia.js**, which allows creating SPA applications while maintaining server-side routing.
-
-#### ⚠️ Architectural Considerations
-
-**Inertia.js does not allow clear separation of frontend/backend roles:**
-
-- ❌ **Single Repository**: Frontend and backend in the same codebase
-- ❌ **Coupled Deployment**: Frontend changes require full application deployment
-- ❌ **Team Dependencies**: Frontend and backend teams must coordinate every release
-- ❌ **Technology Lock-in**: Frontend is tightly bound to backend technology choices
-
-#### 💡 Recommendation
-
-For projects requiring **role separation** between frontend and backend teams:
-
-1. **Separate Client Repository**: Create a dedicated Vue.js/Nuxt.js project
-2. **API-First Approach**: Use this backend as pure API with Sanctum
-3. **Independent Deployment**: Frontend and backend can be deployed separately
-4. **Scalability**: Possibility of having specialized teams for each layer
-
-
 ## Database Schema
 
 The application includes a basic CRM structure with referential integrity constraints:
