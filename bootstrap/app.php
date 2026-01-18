@@ -12,8 +12,24 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->api(append: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
+            // Per le richieste API, restituisci sempre JSON
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                    'error' => 'Token not provided or invalid'
+                ], 401);
+            }
+            
+            // Per le richieste web, se non esiste la route login, restituisci comunque JSON
+            return response()->json([
+                'message' => 'Unauthenticated.',
+                'error' => 'Login required'
+            ], 401);
+        });
     })->create();
